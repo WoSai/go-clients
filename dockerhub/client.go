@@ -82,6 +82,22 @@ func (client *Client) ListTags(ctx context.Context, name string, opt *ListTagsOp
 	return res.ResponseTag, raw, nil
 }
 
+func (client *Client) GetManifest(ctx context.Context, name, reference string) (*ResponseManifest, *http.Response, error) {
+	res := new(Response)
+	raw, _, err := client.client.GetWithContext(ctx,
+		client.url("/v2/%s/manifests/%s", name, reference),
+		requests.Params{},
+		requests.UnmarshalJSONResponse(res),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+	if res.Error() != nil {
+		return nil, raw, res.Error()
+	}
+	return res.ResponseManifest, raw, nil
+}
+
 func (e Error) Error() string {
 	return fmt.Sprintf("%s: %s", e.Code, e.Message)
 }

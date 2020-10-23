@@ -1,5 +1,9 @@
 package dockerhub
 
+import (
+	"github.com/docker/distribution/manifest/schema1"
+)
+
 type (
 	Error struct {
 		Code    ErrorCode   `json:"code"`
@@ -11,15 +15,23 @@ type (
 
 	// Response 通用的响应报文
 	Response struct {
+		Name                string `json:"name,omitempty"`
 		*ResponseRepository `json:",inline"`
 		*ResponseTag        `json:",inline"`
+		*ResponseManifest   `json:",inline"`
 		Errors              []Error `json:"errors,omitempty"`
 	}
 
 	// ResponseTag 查询tag接口响应报文
 	ResponseTag struct {
-		Name string   `json:"name,omitempty"`
 		Tags []string `json:"tags,omitempty"`
+	}
+
+	ResponseManifest struct {
+		Tag          string            `json:"tag,omitempty"`
+		Architecture string            `json:"architecture,omitempty"`
+		FSLayers     []schema1.FSLayer `json:"faLayers,omitempty"`
+		History      []schema1.History `json:"history,omitempty"`
 	}
 
 	// ResponseRepository 查询存储库响应报文
