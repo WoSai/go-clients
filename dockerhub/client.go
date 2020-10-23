@@ -14,14 +14,14 @@ import (
 
 // Client docker registry v2 api的实现
 type Client struct {
-	host   string
-	scheme string
+	Host   string
+	Scheme string
 	option Option
 	client *requests.Session
 }
 
 func parseURL(url string) (string, string, error) {
-	reg, err := regexp.Compile("^(?P<scheme>http[s]?)://(?P<host>[\\w.-]*)[/]?$")
+	reg, err := regexp.Compile("^(?P<Scheme>http[s]?)://(?P<Host>[\\w.-]*)[/]?$")
 	if err != nil {
 		return "", "", err
 	}
@@ -36,15 +36,15 @@ func NewClient(opt Option) (*Client, error) {
 	client := &Client{option: opt}
 
 	if opt.URL == "" {
-		client.host = ""
-		client.scheme = "https"
+		client.Host = ""
+		client.Scheme = "https"
 	} else {
 		scheme, host, err := parseURL(opt.URL)
 		if err != nil {
 			return nil, err
 		}
-		client.scheme = scheme
-		client.host = host
+		client.Scheme = scheme
+		client.Host = host
 	}
 
 	var session *requests.Session
@@ -58,7 +58,7 @@ func NewClient(opt Option) (*Client, error) {
 }
 
 func (client *Client) url(path string, v ...interface{}) string {
-	return client.scheme + "://" + client.host + fmt.Sprintf(path, v...)
+	return client.Scheme + "://" + client.Host + fmt.Sprintf(path, v...)
 }
 
 func (client *Client) ListTags(ctx context.Context, name string, opt *ListTagsOption) (*ResponseTag, *http.Response, error) {
