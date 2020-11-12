@@ -61,6 +61,7 @@ func (client *Client) url(path string, v ...interface{}) string {
 	return client.Scheme + "://" + client.Host + fmt.Sprintf(path, v...)
 }
 
+// ListTags listing image tags, pagination not work: https://github.com/docker/distribution/issues/1936
 func (client *Client) ListTags(ctx context.Context, name string, opt *ListTagsOption) (*ResponseTag, *http.Response, error) {
 	res := new(Response)
 	var params requests.Params
@@ -82,6 +83,7 @@ func (client *Client) ListTags(ctx context.Context, name string, opt *ListTagsOp
 	return res.ResponseTag, raw, nil
 }
 
+// GetManifest fetch the manifest identified by name and reference where reference can be a tag or digest
 func (client *Client) GetManifest(ctx context.Context, name, reference string) (*ResponseManifest, *http.Response, error) {
 	res := new(Response)
 	raw, _, err := client.client.GetWithContext(ctx,
