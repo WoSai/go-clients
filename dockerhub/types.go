@@ -30,7 +30,7 @@ type (
 	ResponseManifest struct {
 		Tag          string            `json:"tag,omitempty"`
 		Architecture string            `json:"architecture,omitempty"`
-		FSLayers     []schema1.FSLayer `json:"faLayers,omitempty"`
+		FSLayers     []schema1.FSLayer `json:"fsLayers,omitempty"`
 		History      []schema1.History `json:"history,omitempty"`
 	}
 
