@@ -6,6 +6,10 @@ import (
 )
 
 type (
+	Response interface {
+		GotErr() error
+	}
+
 	UserInfo struct {
 		Nick                 string `json:"nick,omitempty"`                     // 用户在钉钉上面的昵称
 		UnionID              string `json:"unionid,omitempty"`                  // 用户在当前开放应用所属企业的唯一标识

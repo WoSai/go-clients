@@ -79,11 +79,8 @@ func (ding *Client) GetUserInfoByCode(ctx context.Context, code *RequestGetUserI
 				Query: requests.Any{"accessKey": ding.opt.AppKey, "timestamp": strconv.FormatInt(ts, 10), "signature": signature},
 				Json:  code,
 			},
-			requests.UnmarshalJSONResponse(ret))
-		if err != nil {
-			return err
-		}
-		return ret.DingtalkErr.GotErr()
+			UnmarshalAndParseError(ret))
+		return err
 	})
 	if err == nil {
 		return ret.UserInfo, res, nil
@@ -101,15 +98,13 @@ func (ding *Client) GetAccessToken(ctx context.Context) (string, *http.Response,
 		ctx,
 		ding.url+"/gettoken",
 		requests.Params{Query: requests.Any{"appkey": ding.opt.AppKey, "appsecret": ding.opt.AppSecret}},
-		requests.UnmarshalJSONResponse(ret),
+		UnmarshalAndParseError(ret),
 	)
 	if err != nil {
 		return "", res, err
 	}
-	if ret.DingtalkErr.GotErr() == nil {
-		ding.SetAccessToken(ret.AccessToken)
-	}
-	return ret.AccessToken, res, ret.DingtalkErr.GotErr()
+	ding.SetAccessToken(ret.AccessToken)
+	return ret.AccessToken, res, nil
 }
 
 func (ding *Client) GetUserByUnionID(ctx context.Context, req *RequestGetByUnionID) (*UserGetByUnionId, *http.Response, error) {
@@ -122,12 +117,9 @@ func (ding *Client) GetUserByUnionID(ctx context.Context, req *RequestGetByUnion
 			ctx,
 			ding.url+"/topapi/user/getbyunionid",
 			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: req},
-			requests.UnmarshalJSONResponse(ret),
+			UnmarshalAndParseError(ret),
 		)
-		if err != nil {
-			return err
-		}
-		return ret.DingtalkErr.GotErr()
+		return err
 	})
 	if err == nil {
 		return ret.Result, res, nil
@@ -172,12 +164,9 @@ func (ding *Client) GetOrganizationUserCount(ctx context.Context, onlyActive int
 			ctx,
 			ding.url+"/user/get_org_user_count",
 			requests.Params{Query: requests.Any{"access_token": ding.AccessToken(), "onlyActive": strconv.Itoa(onlyActive)}},
-			requests.UnmarshalJSONResponse(ret),
+			UnmarshalAndParseError(ret),
 		)
-		if err != nil {
-			return err
-		}
-		return ret.GotErr()
+		return err
 	})
 	if err == nil {
 		return ret.Count, res, nil
