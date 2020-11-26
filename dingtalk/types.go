@@ -105,9 +105,14 @@ type (
 	}
 
 	ResponseGetAccessToken struct {
-		DingtalkErr `json:",inline"`
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
+		*DingtalkErr `json:",inline"`
+		AccessToken  string `json:"access_token"`
+		ExpiresIn    int    `json:"expires_in"`
+	}
+
+	ResponseOrganizationUserCount struct {
+		*DingtalkErr `json:",inline"`
+		Count        int `json:"count"`
 	}
 )
 
