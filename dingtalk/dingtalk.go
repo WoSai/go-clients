@@ -146,6 +146,7 @@ func (ding *Client) RetryOnAccessTokenExpired(ctx context.Context, retry int, fn
 		if errors.As(err, &de) && err.(*DingtalkErr).IsAccessTokenExpired() {
 			_, akErr, _ := ding.flight.Do("access_token", func() (interface{}, error) {
 				ak, _, reqErr := ding.GetAccessToken(ctx)
+				ding.flight.Forget("access_token")
 				return ak, reqErr
 			})
 			if akErr != nil {
