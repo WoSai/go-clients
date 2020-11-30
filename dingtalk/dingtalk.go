@@ -176,7 +176,7 @@ func (ding *Client) GetUser(ctx context.Context, get *RequestUserGet) (*UserGetR
 	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
 		res, _, err = ding.client.PostWithContext(
 			ctx,
-			ding.url+"/topapi/v1/user/get",
+			ding.url+"/topapi/v2/user/get",
 			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: get},
 			UnmarshalAndParseError(ret),
 		)
