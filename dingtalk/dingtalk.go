@@ -25,11 +25,6 @@ type (
 		flight singleflight.Group
 		ak     string
 	}
-
-	AccessTokenKeeper struct {
-		mu sync.RWMutex
-		ak string
-	}
 )
 
 func NewClient(opt Option) *Client {
@@ -66,22 +61,20 @@ func (ding *Client) GetUserInfoByCode(ctx context.Context, code *RequestGetUserI
 	var res *http.Response
 	ret := new(ResponseGetUserInfoByCode)
 
-	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
-		ts := time.Now().UnixNano() / 1e6
-		h := hmac.New(sha256.New, []byte(ding.opt.AppSecret))
-		h.Write([]byte(strconv.FormatInt(ts, 10)))
-		signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+	ts := time.Now().UnixNano() / 1e6
+	h := hmac.New(sha256.New, []byte(ding.opt.LoginAppSecret))
+	h.Write([]byte(strconv.FormatInt(ts, 10)))
+	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
-		res, _, err = ding.client.PostWithContext(
-			ctx,
-			ding.url+"/sns/getuserinfo_bycode",
-			requests.Params{
-				Query: requests.Any{"accessKey": ding.opt.AppKey, "timestamp": strconv.FormatInt(ts, 10), "signature": signature},
-				Json:  code,
-			},
-			UnmarshalAndParseError(ret))
-		return err
-	})
+	res, _, err = ding.client.PostWithContext(
+		ctx,
+		ding.url+"/sns/getuserinfo_bycode",
+		requests.Params{
+			Query: requests.Any{"accessKey": ding.opt.LoginAppID, "timestamp": strconv.FormatInt(ts, 10), "signature": signature},
+			Json:  code,
+		},
+		UnmarshalAndParseError(ret))
+
 	if err == nil {
 		return ret.UserInfo, res, nil
 	}
@@ -172,4 +165,25 @@ func (ding *Client) GetOrganizationUserCount(ctx context.Context, onlyActive int
 		return ret.Count, res, nil
 	}
 	return 0, res, err
+}
+
+// GetUser 获取用户 https://ding-doc.dingtalk.com/document#/org-dev-guide/queries-user-details#topic-1960047
+func (ding *Client) GetUser(ctx context.Context, get *RequestUserGet) (*UserGetRequest, *http.Response, error) {
+	var res *http.Response
+	var err error
+	ret := new(ResponseUserGet)
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v1/user/get",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: get},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	if err != nil {
+		return nil, res, err
+	}
+	return ret.Result, res, err
 }
