@@ -24,7 +24,9 @@ jobs:
           AppKey: ${{ secrets.DINGTALK_APP_KEY }}
           AppSecret: ${{ secrets.DINGTALK_APP_SECRET }}
           UserID: ${{ secrets.DINGTALK_USER_ID }}
+      - name: ps
+        run: pwd && ls && cd .. && pwd && ls
       - name: Test
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ./dingtalk
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ...
       - name: Test Coverage Report
         run: bash <(curl -s https://codecov.io/bash)
