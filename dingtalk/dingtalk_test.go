@@ -2,7 +2,6 @@ package dingtalk
 
 import (
 	"context"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -22,7 +21,6 @@ var (
 func init()  {
 	DingClient = NewClient(Option{AgentID: AgentID, AppKey: AppKey, AppSecret: AppSecret})
 	var err error
-	fmt.Println(len(AgentID), len(AppKey), len(AppSecret), len(UserID))
 	testUser, _ , err = DingClient.GetUserInfoV2(ctx, &RequestUserGet{UserID: UserID})
 	if err != nil {
 		panic("userid not exit" + err.Error())
