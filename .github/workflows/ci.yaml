@@ -25,6 +25,6 @@ jobs:
           AppSecret: ${{ secrets.DINGTALK_APP_SECRET }}
           UserID: ${{ secrets.DINGTALK_USER_ID }}
       - name: Test
-        run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ./...
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ./dingtalk
       - name: Test Coverage Report
         run: bash <(curl -s https://codecov.io/bash)
