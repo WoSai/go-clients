@@ -1,0 +1,30 @@
+name: build
+on:
+  push:
+    branches:
+      - master
+      - release/*
+      - feature/*
+      - hotfix/*
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [1.13, 1.14]
+
+    steps:
+      - name: Set up Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+        env:
+          - AgentID: ${{ secrets.DINGTALK_AGENT_ID }}
+          - AppKey: ${{ secrets.DINGTALK_APP_KEY }}
+          - AppSecret: ${{ secrets.DINGTALK_APP_SECRET }}
+          - UserID: ${{ secrets.DINGTALK_USER_ID }}
+      - name: Test
+        run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ./...
+      - name: Test Coverage Report
+        run: bash <(curl -s https://codecov.io/bash)
