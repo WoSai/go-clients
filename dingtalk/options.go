@@ -3,9 +3,12 @@ package dingtalk
 type (
 	// Option 应用凭证
 	Option struct {
-		AgentID   string
-		AppKey    string
-		AppSecret string
+		AgentID          string
+		AppKey           string
+		AppSecret        string
+		LoginAppID       string
+		LoginAppSecret   string
+		LoginCallbackURI string
 	}
 )
 

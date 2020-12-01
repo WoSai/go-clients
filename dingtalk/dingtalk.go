@@ -25,11 +25,6 @@ type (
 		flight singleflight.Group
 		ak     string
 	}
-
-	AccessTokenKeeper struct {
-		mu sync.RWMutex
-		ak string
-	}
 )
 
 func NewClient(opt Option) *Client {
@@ -66,22 +61,20 @@ func (ding *Client) GetUserInfoByCode(ctx context.Context, code *RequestGetUserI
 	var res *http.Response
 	ret := new(ResponseGetUserInfoByCode)
 
-	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
-		ts := time.Now().UnixNano() / 1e6
-		h := hmac.New(sha256.New, []byte(ding.opt.AppSecret))
-		h.Write([]byte(strconv.FormatInt(ts, 10)))
-		signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
+	ts := time.Now().UnixNano() / 1e6
+	h := hmac.New(sha256.New, []byte(ding.opt.LoginAppSecret))
+	h.Write([]byte(strconv.FormatInt(ts, 10)))
+	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
 
-		res, _, err = ding.client.PostWithContext(
-			ctx,
-			ding.url+"/sns/getuserinfo_bycode",
-			requests.Params{
-				Query: requests.Any{"accessKey": ding.opt.AppKey, "timestamp": strconv.FormatInt(ts, 10), "signature": signature},
-				Json:  code,
-			},
-			UnmarshalAndParseError(ret))
-		return err
-	})
+	res, _, err = ding.client.PostWithContext(
+		ctx,
+		ding.url+"/sns/getuserinfo_bycode",
+		requests.Params{
+			Query: requests.Any{"accessKey": ding.opt.LoginAppID, "timestamp": strconv.FormatInt(ts, 10), "signature": signature},
+			Json:  code,
+		},
+		UnmarshalAndParseError(ret))
+
 	if err == nil {
 		return ret.UserInfo, res, nil
 	}
