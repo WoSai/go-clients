@@ -20,10 +20,10 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
         env:
-          - AgentID: ${{ secrets.DINGTALK_AGENT_ID }}
-          - AppKey: ${{ secrets.DINGTALK_APP_KEY }}
-          - AppSecret: ${{ secrets.DINGTALK_APP_SECRET }}
-          - UserID: ${{ secrets.DINGTALK_USER_ID }}
+          AgentID: ${{ secrets.DINGTALK_AGENT_ID }}
+          AppKey: ${{ secrets.DINGTALK_APP_KEY }}
+          AppSecret: ${{ secrets.DINGTALK_APP_SECRET }}
+          UserID: ${{ secrets.DINGTALK_USER_ID }}
       - name: Test
         run: go test -race -coverprofile=coverage.txt -covermode=atomic -v ./...
       - name: Test Coverage Report
