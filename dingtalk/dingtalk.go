@@ -167,23 +167,81 @@ func (ding *Client) GetOrganizationUserCount(ctx context.Context, onlyActive int
 	return 0, res, err
 }
 
-// GetUser 获取用户 https://ding-doc.dingtalk.com/document#/org-dev-guide/queries-user-details#topic-1960047
-func (ding *Client) GetUser(ctx context.Context, get *RequestUserGet) (*UserGetRequest, *http.Response, error) {
+// 获取用户详情V2 https://ding-doc.dingtalk.com/document#/org-dev-guide/queries-user-details
+func (ding *Client) GetUserInfoV2(ctx context.Context, req *RequestUserGet) (*ResponseGetUserInfo, *http.Response, error) {
 	var res *http.Response
 	var err error
-	ret := new(ResponseUserGet)
+	ret := new(ResponseGetUserInfo)
 
 	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
 		res, _, err = ding.client.PostWithContext(
 			ctx,
 			ding.url+"/topapi/v2/user/get",
-			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: get},
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: req},
 			UnmarshalAndParseError(ret),
 		)
 		return err
 	})
-	if err != nil {
-		return nil, res, err
+	return ret, res, err
+}
+
+// 根据手机号获取userid v2  https://ding-doc.dingtalk.com/document#/org-dev-guide/query-users-by-phone-number
+func (ding *Client) GetUserInfoByMobileV2(ctx context.Context, mobile string) (string, *http.Response, error){
+	ret := new(ResponseUserByMobile)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/user/getbymobile",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: requests.Any{"mobile": mobile}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	if err == nil {
+		return ret.Result.Userid, res, err
 	}
+	return "", res, err
+}
+
+// 获取指定用户的所有父部门列表  https://ding-doc.dingtalk.com/document#/org-dev-guide/obtains-the-list-of-all-parent-departments-of-a-user
+func (ding *Client) ListParentDeptByUserV2 (ctx context.Context, userid string) (*DeptListParent, *http.Response, error){
+	ret := new(ResponseGetUserIdByUnionid)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/listparentbyuser",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: requests.Any{"userid": userid}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
 	return ret.Result, res, err
+}
+
+// 获取部门详情 https://ding-doc.dingtalk.com/document#/org-dev-guide/queries-department-details-v1
+func (ding *Client) GetDepartment(ctx context.Context, req *RequestDepartmentInfo) (*DepartmentInfo, *http.Response, error){
+	ret := new(ResponseDeptInfo)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		query := requests.Any{"access_token": ding.AccessToken(), "id": req.DeptId}
+		if req.Language != "" {
+			query["lang"] = string(req.Language)
+		}
+		res, _, err = ding.client.GetWithContext(
+			ctx,
+			ding.url+"/department/get",
+			requests.Params{Query: query},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.DepartmentInfo, res, err
 }

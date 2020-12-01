@@ -70,7 +70,7 @@ type (
 		ts int64
 	}
 
-	UserGetRequest struct {
+	UserGetResponse struct {
 		UserID             string              `json:"userid"`
 		UnionID            string              `json:"unionid"`
 		Name               string              `json:"name"`
@@ -105,7 +105,7 @@ type (
 	// ResponseUserGet https://oapi.dingtalk.com/topapi/v2/user/get
 	ResponseUserGet struct {
 		BasicResponse `json:",inline"`
-		Result        *UserGetRequest `json:"result"`
+		Result        *UserGetResponse `json:"result"`
 	}
 
 	ResponseGetAccessToken struct {
@@ -117,6 +117,98 @@ type (
 	ResponseOrganizationUserCount struct {
 		*DingtalkErr `json:",inline"`
 		Count        int `json:"count"`
+	}
+
+	DeptLeader struct {
+		DeptId int  `json:"dept_id"`
+		Leader bool `json:"leader"`
+	}
+
+	DeptOrder struct {
+		DeptId int `json:"dept_id"`
+		Order  int `json:"order"`
+	}
+
+	CompleteUserInfo struct {
+		UserID        string       `json:"userid"`
+		UnionID       string       `json:"unionid"`
+		Name          string       `json:"name"`
+		Avatar        string       `json:"avatar"`
+		StateCode     string       `json:"state_code"`
+		Mobile        string       `json:"mobile"`
+		HideMobile    bool         `json:"hide_mobile"`
+		Telephone     string       `json:"telephone"`
+		JobNumber     string       `json:"job_number"`
+		Title         string       `json:"title"`
+		Email         string       `json:"email"`
+		WorkPlace     string       `json:"work_place"`
+		Remark        string       `json:"remark"`
+		DeptIdList    []int        `json:"dept_id_list"`
+		DeptOrderList []DeptOrder  `json:"dept_order_list"`
+		Extension     string       `json:"extension"`
+		HiredDate     int          `json:"hired_date"`
+		Active        bool         `json:"active"`
+		RealAuthed    bool         `json:"real_authed"`
+		Senior        bool         `json:"senior"`
+		Admin         bool         `json:"admin"`
+		Boss          bool         `json:"boss"`
+		LeaderInDept  []DeptLeader `json:"leader_in_dept"`
+		RoleList      []UserRole   `json:"role_list"`
+	}
+
+	ResponseGetUserInfo struct {
+		*DingtalkErr `json:",inline"`
+		Result       *CompleteUserInfo `json:"result"`
+	}
+
+	ResponseUserByMobile struct {
+		BasicResponse `json:",inline"`
+		Result        struct {
+			Userid string `json:"userid"`
+		} `json:"result"`
+	}
+
+	ParentDeptIds struct {
+		ParentDeptIdList []int `json:"parent_dept_id_list"`
+	}
+
+	DeptListParent struct {
+		ParentDeptList []ParentDeptIds `json:"parent_list"`
+	}
+
+	ResponseGetUserIdByUnionid struct {
+		BasicResponse `json:",inline"`
+		Result        *DeptListParent `json:"result"`
+	}
+
+	RequestDepartmentInfo struct {
+		DeptId   string `json:"id"`
+		Language Lang   `json:"lang,omitempty"`
+	}
+
+	DepartmentInfo struct {
+		Id                    int    `json:"id"`
+		Name                  string `json:"name"`
+		Order                 int    `json:"order"`
+		ParentId              int    `json:"parentid"`
+		SourceIdentifier      string `json:"source_identifier"`
+		CreateDeptGroup       bool   `json:"createDeptGroup"`
+		AutoAddUser           bool   `json:"autoAddUser"`
+		GroupContainSubDept   bool   `json:"groupContainSubDept"`
+		OrgDeptOwner          string `json:"orgDeptOwner"`
+		DeptGroupChatId       string `json:"deptGroupChatId"`
+		DeptManagerUseridList string `json:"deptManagerUseridList"`
+		OuterDept             bool   `json:"outerDept"`
+		OuterPermitUsers      string `json:"outerPermitUsers"`
+		OuterPermitDepts      string `json:"outerPermitDepts"`
+		DeptHiding            bool   `json:"deptHiding"`
+		DeptPermits           string `json:"deptPermits"`
+		UserPermits           string `json:"userPermits"`
+	}
+
+	ResponseDeptInfo struct {
+		BasicResponse `json:",inline"`
+		*DepartmentInfo
 	}
 )
 
