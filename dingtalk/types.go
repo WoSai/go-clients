@@ -210,6 +210,125 @@ type (
 		BasicResponse `json:",inline"`
 		*DepartmentInfo
 	}
+
+	RequestDepartmentInfoV2 struct {
+		DeptID   int    `json:"dept_id"`
+		Language string `json:"language,omitempty"`
+	}
+
+	DepartmentInfoV2 struct {
+		DeptID                int      `json:"dept_id"`
+		Name                  string   `json:"name,omitempty"`
+		ParentID              int      `json:"parent_id,omitempty"`
+		SourceIdentifier      string   `json:"source_identifier,omitempty"`
+		CreateDeptGroup       bool     `json:"create_dept_group,omitempty"`
+		AutoAddUser           bool     `json:"auto_add_user,omitempty"`
+		FromUnionOrg          bool     `json:"from_union_org,omitempty"`
+		Tags                  string   `json:"tags,omitempty"`
+		Order                 int      `json:"order,omitempty"`
+		DeptGroupChatID       string   `json:"dept_group_chat_id,omitempty"`
+		GroupContainSubDept   bool     `json:"group_contain_sub_dept,omitempty"`
+		OrgDeptOwner          string   `json:"org_dept_owner,omitempty"`
+		DeptManagerUseridList []string `json:"dept_manager_userid_list,omitempty"`
+		OuterDept             bool     `json:"outer_dept,omitempty"`
+		OuterPermitDepts      []int    `json:"outer_permit_depts,omitempty"`
+		OuterPermitUsers      []string `json:"outer_permit_users,omitempty"`
+		HideDept              bool     `json:"hide_dept,omitempty"`
+		UserPermits           []string `json:"user_permits,omitempty"`
+		DeptPermits           []int    `json:"dept_permits,omitempty"`
+	}
+
+	ResponseDeptInfoV2 struct {
+		BasicResponse `json:",inline"`
+		Result        *DepartmentInfoV2 `json:"result,omitempty"`
+	}
+
+	// 钉钉的时间格式
+	DingTime struct {
+		time.Time
+	}
+
+	FormComponentValue struct {
+		Name          string `json:"name,omitempty"`
+		Value         string `json:"value,omitempty"`
+		ExtValue      string `json:"ext_value,omitempty"`
+		ID            string `json:"id,omitempty"`
+		ComponentType string `json:"component_type,omitempty"`
+	}
+
+	ProcessApprovers struct {
+		TaskActionType string   `json:"task_action_type,omitempty"`
+		UserIDs        []string `json:"user_ids,omitempty"`
+	}
+
+	// 审批请求参数
+	RequestCreateProcessInstance struct {
+		FormComponentValues []*FormComponentValue `json:"form_component_values,omitempty"`
+		AgentID             string                `json:"agent_id,omitempty"`
+		DeptID              string                `json:"dept_id,omitempty"`
+		ProcessCode         string                `json:"process_code,omitempty"`
+		OriginatorUserID    string                `json:"originator_user_id,omitempty"` // 审批发起人ID
+		ApproversV2         []ProcessApprovers    `json:"approvers_v2,omitempty"`
+		CCList              string                `json:"cc_list,omitempty"`     // 抄送人userid列表
+		CCPosition          string                `json:"cc_position,omitempty"` // 抄送时间，分为（START, FINISH, START_FINISH）
+	}
+
+	ResponseCreateProcessInstance struct {
+		BasicResponse     `json:",inline"`
+		ProcessInstanceID string `json:"process_instance_id,omitempty"`
+	}
+
+	ProcessAttachment struct {
+		FileName string `json:"file_name,omitempty"`
+		FileSize string `json:"file_size,omitempty"`
+		FileID   string `json:"file_id,omitempty"`
+		FileType string `json:"file_type,omitempty"`
+	}
+
+	ProcessOperationRecord struct {
+		UserID          string               `json:"user_id,omitempty"`
+		Date            DingTime             `json:"date,omitempty"`
+		OperationType   string               `json:"operation_type,omitempty"`
+		OperationResult string               `json:"operation_result,omitempty"`
+		Remark          string               `json:"remark,omitempty"`
+		Attachments     []*ProcessAttachment `json:"attachments,omitempty"`
+	}
+
+	ProcessTask struct {
+		UserID     string   `json:"userid,omitempty"`
+		TaskStatus string   `json:"task_status,omitempty"`
+		TaskResult string   `json:"task_result,omitempty"`
+		CreateTime DingTime `json:"create_time,omitempty"`
+		FinishTime DingTime `json:"finish_time,omitempty"`
+		TaskID     string   `json:"taskid,omitempty"`
+		URL        string   `json:"url,omitempty"`
+	}
+
+	// 审批实例详情
+	ProcessInstance struct {
+		Title                      string                    `json:"title,omitempty"`
+		CreateTime                 DingTime                  `json:"create_time,omitempty"`
+		FinishTime                 DingTime                  `json:"finish_time,omitempty"`
+		OriginatorUserID           string                    `json:"originator_userid,omitempty"`
+		OriginatorDeptID           string                    `json:"originator_dept_id,omitempty"`
+		Status                     string                    `json:"status,omitempty"` // RUNNING审批中COMPLETED完成
+		ApproverUserIDs            []string                  `json:"approver_userids,omitempty"`
+		CCUserIDs                  []string                  `json:"cc_userids,omitempty"`
+		Result                     string                    `json:"result,omitempty"` // agree同意refuse拒绝
+		BusinessID                 string                    `json:"business_id,omitempty"`
+		OperationRecords           []*ProcessOperationRecord `json:"operation_records,omitempty"`
+		Tasks                      []*ProcessTask            `json:"tasks,omitempty"`
+		OriginatorDeptName         string                    `json:"originator_dept_name,omitempty"`
+		BizAction                  string                    `json:"biz_action,omitempty"`
+		AttachedProcessInstanceIDs []string                  `json:"attached_process_instance_ids,omitempty"`
+		FormComponentValues        []*FormComponentValue     `json:"form_component_values,omitempty"`
+		MainProcessInstanceID      string                    `json:"main_process_instance_id,omitempty"`
+	}
+
+	ResponseGetProcessInstance struct {
+		BasicResponse   `json:",inline"`
+		ProcessInstance *ProcessInstance `json:"process_instance,omitempty"`
+	}
 )
 
 func (ts *UnixTimestamp) UnmarshalJSON(data []byte) error {
@@ -227,4 +346,20 @@ func (ts *UnixTimestamp) Time() time.Time {
 
 func (ts *UnixTimestamp) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ts.ts)
+}
+
+func (dt *DingTime) UnmarshalJSON(b []byte) error {
+	if string(b) == "null" {
+		return nil
+	}
+	ti, err := time.Parse("\"2006-01-02 15:04:05\"", string(b))
+	if err != nil {
+		return err
+	}
+	dt.Time = ti
+	return nil
+}
+
+func (dt DingTime) MarshalJSON() ([]byte, error) {
+	return []byte(dt.Time.Format("\"2006-01-02 15:04:05\"")), nil
 }

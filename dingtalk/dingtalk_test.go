@@ -2,6 +2,8 @@ package dingtalk
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
@@ -12,16 +14,19 @@ var ctx = context.Background()
 var testUser *ResponseGetUserInfo
 
 var (
-	AgentID = os.Getenv("AgentID")
-	AppKey = os.Getenv("AppKey")
+	AgentID   = os.Getenv("AgentID")
+	AppKey    = os.Getenv("AppKey")
 	AppSecret = os.Getenv("AppSecret")
-	UserID = os.Getenv("UserID")
+	UserID    = os.Getenv("UserID")
 )
 
-func init()  {
+func init() {
 	DingClient = NewClient(Option{AgentID: AgentID, AppKey: AppKey, AppSecret: AppSecret})
-	var err error
-	testUser, _ , err = DingClient.GetUserInfoV2(ctx, &RequestUserGet{UserID: UserID})
+	_, _, err := DingClient.GetAccessToken(ctx)
+	if err != nil {
+		panic("get access token fail:" + err.Error())
+	}
+	testUser, _, err = DingClient.GetUserInfoV2(ctx, &RequestUserGet{UserID: UserID})
 	if err != nil {
 		panic("userid not exit" + err.Error())
 	}
@@ -62,13 +67,13 @@ func TestClient_GetUserInfoByMobileV2(t *testing.T) {
 }
 
 func TestClient_GetUserInfoV2(t *testing.T) {
-	user, _ , err := DingClient.GetUserInfoV2(ctx, &RequestUserGet{UserID: testUser.Result.UserID})
+	user, _, err := DingClient.GetUserInfoV2(ctx, &RequestUserGet{UserID: testUser.Result.UserID})
 	assert.Nil(t, err)
 	assert.Equal(t, user.Result.UserID, testUser.Result.UserID)
 }
 
 func TestClient_ListParentDeptByUserV2(t *testing.T) {
-	_, _ , err := DingClient.ListParentDeptByUserV2(ctx, testUser.Result.UserID)
+	_, _, err := DingClient.ListParentDeptByUserV2(ctx, testUser.Result.UserID)
 	assert.Nil(t, err)
 }
 
@@ -77,4 +82,54 @@ func TestClient_GetOrganizationUserCount(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestClient_CreateProcessInstance(t *testing.T) {
+	req := &RequestCreateProcessInstance{
+		FormComponentValues: []*FormComponentValue{
+			{
+				Name:  "补卡时间",
+				Value: "2021-03-31 09:00",
+			},
+			{
+				Name:  "补卡理由",
+				Value: "忘打卡",
+			},
+		},
+		AgentID:          AgentID,
+		DeptID:           "477274342",
+		ProcessCode:      "PROC-0F200284-842E-46FF-9ACC-64DB3176150C",
+		OriginatorUserID: UserID,
+		ApproversV2: []ProcessApprovers{
+			{
+				TaskActionType: "OR",
+				UserIDs:        []string{UserID, "1824661867777911"},
+			},
+			{
+				TaskActionType: "NONE",
+				UserIDs:        []string{UserID},
+			},
+		},
+	}
+	id, _, _ := DingClient.CreateProcessInstance(ctx, req)
+	fmt.Println(id)
+}
 
+func TestClient_GetProcessInstance(t *testing.T) {
+	//"f4b924d1-b13b-4dc1-ae5a-aea4716ecb5c"
+	//"01b3a55b-d92d-40c7-ae70-87b13daf11e5"
+	pi, _, _ := DingClient.GetProcessInstance(ctx, "01b3a55b-d92d-40c7-ae70-87b13daf11e5")
+	b, _ := json.Marshal(pi)
+	fmt.Println(string(b))
+}
+
+func TestClient_1(t *testing.T) {
+	// 获取用户父部门列表
+	res, _, _ := DingClient.ListParentDeptByUserV2(ctx, UserID)
+	b, _ := json.Marshal(res)
+	fmt.Println(string(b))
+	for _, dept := range res.ParentDeptList[0].ParentDeptIdList {
+		// 获取部门详情
+		resp, _, _ := DingClient.GetDepartmentV2(ctx, dept)
+		b, _ = json.Marshal(resp)
+		fmt.Println(string(b))
+	}
+}

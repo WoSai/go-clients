@@ -186,7 +186,7 @@ func (ding *Client) GetUserInfoV2(ctx context.Context, req *RequestUserGet) (*Re
 }
 
 // 根据手机号获取userid v2  https://ding-doc.dingtalk.com/document#/org-dev-guide/query-users-by-phone-number
-func (ding *Client) GetUserInfoByMobileV2(ctx context.Context, mobile string) (string, *http.Response, error){
+func (ding *Client) GetUserInfoByMobileV2(ctx context.Context, mobile string) (string, *http.Response, error) {
 	ret := new(ResponseUserByMobile)
 	var res *http.Response
 	var err error
@@ -207,7 +207,7 @@ func (ding *Client) GetUserInfoByMobileV2(ctx context.Context, mobile string) (s
 }
 
 // 获取指定用户的所有父部门列表  https://ding-doc.dingtalk.com/document#/org-dev-guide/obtains-the-list-of-all-parent-departments-of-a-user
-func (ding *Client) ListParentDeptByUserV2 (ctx context.Context, userid string) (*DeptListParent, *http.Response, error){
+func (ding *Client) ListParentDeptByUserV2(ctx context.Context, userid string) (*DeptListParent, *http.Response, error) {
 	ret := new(ResponseGetUserIdByUnionid)
 	var res *http.Response
 	var err error
@@ -225,7 +225,7 @@ func (ding *Client) ListParentDeptByUserV2 (ctx context.Context, userid string) 
 }
 
 // 获取部门详情 https://ding-doc.dingtalk.com/document#/org-dev-guide/queries-department-details-v1
-func (ding *Client) GetDepartment(ctx context.Context, req *RequestDepartmentInfo) (*DepartmentInfo, *http.Response, error){
+func (ding *Client) GetDepartment(ctx context.Context, req *RequestDepartmentInfo) (*DepartmentInfo, *http.Response, error) {
 	ret := new(ResponseDeptInfo)
 	var res *http.Response
 	var err error
@@ -244,4 +244,58 @@ func (ding *Client) GetDepartment(ctx context.Context, req *RequestDepartmentInf
 		return err
 	})
 	return ret.DepartmentInfo, res, err
+}
+
+// 发起审批实例 https://developers.dingtalk.com/document/app/initiate-approval
+func (ding *Client) CreateProcessInstance(ctx context.Context, req *RequestCreateProcessInstance) (string, *http.Response, error) {
+	ret := new(ResponseCreateProcessInstance)
+	var err error
+	var res *http.Response
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/processinstance/create",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: req},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.ProcessInstanceID, res, err
+}
+
+// 获取审批实例详情 https://developers.dingtalk.com/document/app/obtains-the-details-of-a-single-approval-instance
+func (ding *Client) GetProcessInstance(ctx context.Context, processInstanceID string) (*ProcessInstance, *http.Response, error) {
+	ret := new(ResponseGetProcessInstance)
+	var err error
+	var res *http.Response
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/processinstance/get",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: requests.Any{"process_instance_id": processInstanceID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.ProcessInstance, res, err
+}
+
+// 获取部门详情,可以得到部门主管
+func (ding *Client) GetDepartmentV2(ctx context.Context, deptID int) (*DepartmentInfoV2, *http.Response, error) {
+	ret := new(ResponseDeptInfoV2)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/get",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentInfoV2{DeptID: deptID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
 }
