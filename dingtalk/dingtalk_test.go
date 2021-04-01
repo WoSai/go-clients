@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"strconv"
 	"testing"
 )
 
@@ -83,19 +84,20 @@ func TestClient_GetOrganizationUserCount(t *testing.T) {
 }
 
 func TestClient_CreateProcessInstance(t *testing.T) {
+	agentID , _:= strconv.Atoi(AgentID)
 	req := &RequestCreateProcessInstance{
 		FormComponentValues: []*FormComponentValue{
 			{
 				Name:  "补卡时间",
-				Value: "2021-03-31 09:00",
+				Value: "2021-04-01 09:00",
 			},
 			{
 				Name:  "补卡理由",
 				Value: "忘打卡",
 			},
 		},
-		AgentID:          AgentID,
-		DeptID:           "477274342",
+		AgentID:          agentID,
+		DeptID:           477274342,
 		ProcessCode:      "PROC-0F200284-842E-46FF-9ACC-64DB3176150C",
 		OriginatorUserID: UserID,
 		ApproversV2: []ProcessApprovers{

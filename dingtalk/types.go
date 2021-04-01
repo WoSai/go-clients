@@ -264,8 +264,8 @@ type (
 	// 审批请求参数
 	RequestCreateProcessInstance struct {
 		FormComponentValues []*FormComponentValue `json:"form_component_values,omitempty"`
-		AgentID             string                `json:"agent_id,omitempty"`
-		DeptID              string                `json:"dept_id,omitempty"`
+		AgentID             int                   `json:"agent_id,omitempty"`
+		DeptID              int                   `json:"dept_id,omitempty"`
 		ProcessCode         string                `json:"process_code,omitempty"`
 		OriginatorUserID    string                `json:"originator_user_id,omitempty"` // 审批发起人ID
 		ApproversV2         []ProcessApprovers    `json:"approvers_v2,omitempty"`
