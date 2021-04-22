@@ -6,23 +6,31 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"os"
+	"strconv"
 	"testing"
 )
 
 var DingClient *Client
 var ctx = context.Background()
 var testUser *ResponseGetUserInfo
+var DeptID int
 
 var (
 	AgentID   = os.Getenv("AgentID")
 	AppKey    = os.Getenv("AppKey")
 	AppSecret = os.Getenv("AppSecret")
 	UserID    = os.Getenv("UserID")
+	_deptID    = os.Getenv("DeptID")
 )
 
 func init() {
+	var err error
+	DeptID, err = strconv.Atoi(_deptID)
+	if err != nil {
+		panic(fmt.Errorf("%w DeptID: %s not int", err, _deptID))
+	}
 	DingClient = NewClient(Option{AgentID: AgentID, AppKey: AppKey, AppSecret: AppSecret})
-	_, _, err := DingClient.GetAccessToken(ctx)
+	_, _, err = DingClient.GetAccessToken(ctx)
 	if err != nil {
 		panic("get access token fail:" + err.Error())
 	}
@@ -132,4 +140,16 @@ func TestClient_1(t *testing.T) {
 		b, _ = json.Marshal(resp)
 		fmt.Println(string(b))
 	}
+}
+
+func TestClient_GetParentDepartmentV2(t *testing.T) {
+	info, _, err := DingClient.GetParentDepartmentV2(ctx, DeptID)
+	assert.Nil(t, err)
+	fmt.Println(info.ParentIDList)
+}
+
+func TestClient_GetSubDepartmentV2(t *testing.T) {
+	info, _, err := DingClient.GetSubDepartmentV2(ctx, DeptID)
+	assert.Nil(t, err)
+	fmt.Println(info.SubIDList)
 }
