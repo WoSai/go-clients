@@ -243,6 +243,24 @@ type (
 		Result        *DepartmentInfoV2 `json:"result,omitempty"`
 	}
 
+	ParentDeptsV2 struct {
+		ParentIDList []int `json:"parent_id_list"`
+	}
+
+	RespParentDeptsV2 struct {
+		BasicResponse `json:",inline"`
+		Result        *ParentDeptsV2 `json:"result,omitempty"`
+	}
+
+	SubDeptsV2 struct {
+		SubIDList []int `json:"dept_id_list"`
+	}
+
+	RespSubDeptsV2 struct {
+		BasicResponse `json:",inline"`
+		Result        *SubDeptsV2 `json:"result,omitempty"`
+	}
+
 	// 钉钉的时间格式
 	DingTime struct {
 		time.Time

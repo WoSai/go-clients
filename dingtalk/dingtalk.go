@@ -299,3 +299,39 @@ func (ding *Client) GetDepartmentV2(ctx context.Context, deptID int) (*Departmen
 	})
 	return ret.Result, res, err
 }
+
+// 获取指定部门的所有父部门列表  https://developers.dingtalk.com/document/app/query-the-list-of-all-parent-departments-of-a-department
+func (ding *Client) GetParentDepartmentV2(ctx context.Context, deptID int) (*ParentDeptsV2, *http.Response, error) {
+	ret := new(RespParentDeptsV2)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/listparentbydept",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentInfoV2{DeptID: deptID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
+}
+
+// 获取子部门ID列表  https://developers.dingtalk.com/document/app/obtain-a-sub-department-id-list-v2
+func (ding *Client) GetSubDepartmentV2(ctx context.Context, deptID int) (*SubDeptsV2, *http.Response, error) {
+	ret := new(RespSubDeptsV2)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/listsubid",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentInfoV2{DeptID: deptID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
+}
