@@ -153,3 +153,9 @@ func TestClient_GetSubDepartmentV2(t *testing.T) {
 	assert.Nil(t, err)
 	fmt.Println(info.SubIDList)
 }
+
+func TestClient_GetDepartmentUserList(t *testing.T) {
+	info, _, err := DingClient.GetDepartmentUserList(ctx, 155253593, 0, 100)
+	assert.Nil(t, err)
+	fmt.Println(info)
+}
