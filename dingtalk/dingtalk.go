@@ -353,3 +353,20 @@ func (ding *Client) GetDepartmentUserList(ctx context.Context, deptID, cursor, s
 	})
 	return ret.Result, res, err
 }
+
+func (ding *Client) GetDepartmentListParentByUser(ctx context.Context, dingID string) (*DepartmentListParentByUser, *http.Response, error) {
+	ret := new(RespDepartmentListParentByUser)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/listparentbyuser",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentListParentByUser{UserID: dingID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
+}

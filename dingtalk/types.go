@@ -261,6 +261,21 @@ type (
 		Result        *DepartmentUserList `json:"result,omitempty"`
 	}
 
+	RequestDepartmentListParentByUser struct {
+		UserID string `json:"userid"`
+	}
+
+	DepartmentListParentByUser struct {
+		ParentList []struct {
+			ParentDeptIDList []int `json:"parent_dept_id_list"`
+		} `json:"parent_list"`
+	}
+
+	RespDepartmentListParentByUser struct {
+		BasicResponse `json:",inline"`
+		Result        *DepartmentListParentByUser `json:"result,omitempty"`
+	}
+
 	DepartmentInfoV2 struct {
 		DeptID                int      `json:"dept_id"`
 		Name                  string   `json:"name,omitempty"`
