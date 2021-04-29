@@ -335,3 +335,38 @@ func (ding *Client) GetSubDepartmentV2(ctx context.Context, deptID int) (*SubDep
 	})
 	return ret.Result, res, err
 }
+
+// 获取部门用户详情  https://developers.dingtalk.com/document/app/queries-the-complete-information-of-a-department-user
+func (ding *Client) GetDepartmentUserList(ctx context.Context, deptID, cursor, size int) (*DepartmentUserList, *http.Response, error) {
+	ret := new(RespDepartmentUserInfo)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/user/list",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentUserList{DeptID: deptID, Cursor: cursor, Size: size}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
+}
+
+func (ding *Client) GetDepartmentListParentByUser(ctx context.Context, dingID string) (*DepartmentListParentByUser, *http.Response, error) {
+	ret := new(RespDepartmentListParentByUser)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/v2/department/listparentbyuser",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &RequestDepartmentListParentByUser{UserID: dingID}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.Result, res, err
+}

@@ -216,6 +216,66 @@ type (
 		Language string `json:"language,omitempty"`
 	}
 
+	RequestDepartmentUserList struct {
+		DeptID int `json:"dept_id"`
+		Cursor int `json:"cursor"`
+		Size   int `json:"size"`
+	}
+
+	DepartmentUserInfo struct {
+		UserID               string `json:"userid"`
+		UnionID              string `json:"unionid"`
+		Name                 string `json:"name"`
+		Avatar               string `json:"avatar"`
+		StateCode            string `json:"state_code"`
+		Mobile               string `json:"mobile"`
+		HideMobile           bool   `json:"hide_mobile"`
+		Telephone            string `json:"telephone"`
+		JobNumber            string `json:"job_number"`
+		Title                string `json:"title"`
+		Email                string `json:"email"`
+		OrgEmail             string `json:"org_email"`
+		WorkPlace            string `json:"work_place"`
+		Remark               string `json:"remark"`
+		DeptIDList           []int  `json:"dept_id_list"`
+		DeptOrder            int    `json:"dept_order"`
+		Extension            string `json:"extension"`
+		HiredDate            int    `json:"hired_date"`
+		Active               bool   `json:"active"`
+		Admin                bool   `json:"admin"`
+		Boss                 bool   `json:"boss"`
+		Leader               bool   `json:"leader"`
+		ExclusiveAccount     bool   `json:"exclusive_account"`
+		LoginID              string `json:"login_id"`
+		ExclusiveAccountType string `json:"exclusive_account_type"`
+	}
+
+	DepartmentUserList struct {
+		HasMore    bool                 `json:"has_more"`
+		NextCursor int                  `json:"next_cursor"`
+		List       []DepartmentUserInfo `json:"list"`
+	}
+
+	RespDepartmentUserInfo struct {
+		BasicResponse `json:",inline"`
+		Result        *DepartmentUserList `json:"result,omitempty"`
+	}
+
+	RequestDepartmentListParentByUser struct {
+		UserID string `json:"userid"`
+	}
+
+	DepartmentListParentByUser struct {
+		ParentList []struct {
+			ParentDeptIDList []int `json:"parent_dept_id_list"`
+		} `json:"parent_list"`
+	}
+
+	RespDepartmentListParentByUser struct {
+		BasicResponse `json:",inline"`
+		Result        *DepartmentListParentByUser `json:"result,omitempty"`
+	}
+
 	DepartmentInfoV2 struct {
 		DeptID                int      `json:"dept_id"`
 		Name                  string   `json:"name,omitempty"`
