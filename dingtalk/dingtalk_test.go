@@ -165,3 +165,36 @@ func TestClient_GetDepartmentListParentByUser(t *testing.T) {
 	assert.Nil(t, err)
 	fmt.Println(info)
 }
+
+func TestClient_SendCorpConversation_markdown(t *testing.T) {
+	taskID, _, err := DingClient.SendCorpConversation(ctx, RequestSendCorpConversation{
+		UserIDList: []string{UserID},
+		DeptIDList: nil,
+		ToAllUser:  false,
+		Msg:        MarkDownMsg{"markdown", MarkDown{"测试title2222", "###Test TEXT"}}})
+	assert.Nil(t, err)
+	assert.NotEqual(t, taskID, "0")
+}
+
+func TestClient_SendCorpConversation_actioncard(t *testing.T) {
+	taskID, _, err := DingClient.SendCorpConversation(ctx, RequestSendCorpConversation{
+		UserIDList: []string{UserID},
+		DeptIDList: nil,
+		ToAllUser:  false,
+		Msg: ActionCardMsg{
+			MsgType: "action_card",
+			ActionCard: ActionCard{
+				Title:       "action card title",
+				Markdown:    "支持markdown格式的正文内容",
+				SingleTitle: "SingleTitle",
+				SingleUrl:   "https://okr.wosai-inc.com",
+				BtnOrientation: "1",
+				BtnList: []BtnList{{
+					Title: "Title",
+					ActionUrl: "dingtalk://dingtalkclient/page/link?url=https%3A%2F%2Fokr.wosai-inc.com&pc_slide=false",
+				}},
+			}},
+	})
+	assert.Nil(t, err)
+	assert.NotEqual(t, taskID, "0")
+}

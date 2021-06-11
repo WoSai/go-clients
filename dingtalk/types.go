@@ -2,6 +2,7 @@ package dingtalk
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 )
 
@@ -276,6 +277,54 @@ type (
 		Result        *DepartmentListParentByUser `json:"result,omitempty"`
 	}
 
+	UserIDs []string
+
+	RequestSendCorpConversation struct {
+		AgentID    int     `json:"agent_id"`
+		UserIDList UserIDs `json:"userid_list,omitempty"`
+		DeptIDList UserIDs `json:"dept_id_list,omitempty"`
+		ToAllUser  bool    `json:"to_all_user,omitempty"`
+		Msg        DDMsg   `json:"msg"`
+	}
+
+	RespSendCorpConversation struct {
+		BasicResponse `json:",inline"`
+		TaskID        int `json:"task_id,omitempty"`
+	}
+
+	DDMsg interface {
+		DDMsg()
+	}
+
+	MarkDownMsg struct {
+		MsgType  string   `json:"msgtype"`
+		MarkDown MarkDown `json:"markdown"`
+	}
+
+	MarkDown struct {
+		Title string `json:"title"`
+		Text  string `json:"text"`
+	}
+
+	ActionCardMsg struct {
+		MsgType    string     `json:"msgtype"`
+		ActionCard ActionCard `json:"action_card"`
+	}
+
+	ActionCard struct {
+		Title          string    `json:"title"`
+		Markdown       string    `json:"markdown"`
+		SingleTitle    string    `json:"single_title,omitempty"`
+		SingleUrl      string    `json:"single_url,omitempty"`
+		BtnOrientation string    `json:"btn_orientation,omitempty"`
+		BtnList        []BtnList `json:"btn_json_list,omitempty"`
+	}
+
+	BtnList struct {
+		Title     string `json:"title,omitempty"`
+		ActionUrl string `json:"action_url,omitempty"`
+	}
+
 	DepartmentInfoV2 struct {
 		DeptID                int      `json:"dept_id"`
 		Name                  string   `json:"name,omitempty"`
@@ -441,3 +490,12 @@ func (dt *DingTime) UnmarshalJSON(b []byte) error {
 func (dt DingTime) MarshalJSON() ([]byte, error) {
 	return []byte(dt.Time.Format("\"2006-01-02 15:04:05\"")), nil
 }
+
+func (us UserIDs) MarshalJSON() ([]byte, error) {
+	s := strings.Join(us, ",")
+	return []byte(`"` + s + `"`), nil
+}
+
+func (msg MarkDownMsg) DDMsg() {}
+
+func (msg ActionCardMsg) DDMsg() {}

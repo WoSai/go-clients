@@ -370,3 +370,29 @@ func (ding *Client) GetDepartmentListParentByUser(ctx context.Context, dingID st
 	})
 	return ret.Result, res, err
 }
+
+// 发送工作通知
+func (ding *Client) SendCorpConversation(ctx context.Context, req RequestSendCorpConversation) (int, *http.Response, error) {
+	ret := new(RespSendCorpConversation)
+	var res *http.Response
+	var err error
+
+	if req.AgentID == 0 {
+		agentID, err := strconv.Atoi(ding.opt.AgentID)
+		if err != nil {
+			return 0, nil, err
+		}
+		req.AgentID = agentID
+	}
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/message/corpconversation/asyncsend_v2",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: &req},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+	return ret.TaskID, res, err
+}
