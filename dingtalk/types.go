@@ -130,30 +130,33 @@ type (
 	}
 
 	CompleteUserInfo struct {
-		UserID        string       `json:"userid"`
-		UnionID       string       `json:"unionid"`
-		Name          string       `json:"name"`
-		Avatar        string       `json:"avatar"`
-		StateCode     string       `json:"state_code"`
-		Mobile        string       `json:"mobile"`
-		HideMobile    bool         `json:"hide_mobile"`
-		Telephone     string       `json:"telephone"`
-		JobNumber     string       `json:"job_number"`
-		Title         string       `json:"title"`
-		Email         string       `json:"email"`
-		WorkPlace     string       `json:"work_place"`
-		Remark        string       `json:"remark"`
-		DeptIdList    []int        `json:"dept_id_list"`
-		DeptOrderList []DeptOrder  `json:"dept_order_list"`
-		Extension     string       `json:"extension"`
-		HiredDate     int          `json:"hired_date"`
-		Active        bool         `json:"active"`
-		RealAuthed    bool         `json:"real_authed"`
-		Senior        bool         `json:"senior"`
-		Admin         bool         `json:"admin"`
-		Boss          bool         `json:"boss"`
-		LeaderInDept  []DeptLeader `json:"leader_in_dept"`
-		RoleList      []UserRole   `json:"role_list"`
+		UserID           string       `json:"userid"`
+		UnionID          string       `json:"unionid"`
+		Name             string       `json:"name"`
+		Avatar           string       `json:"avatar"`
+		StateCode        string       `json:"state_code"`
+		ManagerUserID    string       `json:"manager_userid"`
+		Mobile           string       `json:"mobile"`
+		HideMobile       bool         `json:"hide_mobile"`
+		Telephone        string       `json:"telephone"`
+		JobNumber        string       `json:"job_number"`
+		Title            string       `json:"title"`
+		Email            string       `json:"email"`
+		WorkPlace        string       `json:"work_place"`
+		Remark           string       `json:"remark"`
+		ExclusiveAccount string       `json:"exclusive_account"`
+		OrgEmail         string       `json:"org_email"`
+		DeptIdList       []int        `json:"dept_id_list"`
+		DeptOrderList    []DeptOrder  `json:"dept_order_list"`
+		Extension        string       `json:"extension"`
+		HiredDate        int          `json:"hired_date"`
+		Active           bool         `json:"active"`
+		RealAuthed       bool         `json:"real_authed"`
+		Senior           bool         `json:"senior"`
+		Admin            bool         `json:"admin"`
+		Boss             bool         `json:"boss"`
+		LeaderInDept     []DeptLeader `json:"leader_in_dept"`
+		RoleList         []UserRole   `json:"role_list"`
 	}
 
 	ResponseGetUserInfo struct {
