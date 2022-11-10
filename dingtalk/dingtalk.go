@@ -30,10 +30,10 @@ type (
 func NewClient(opt Option) *Client {
 	return &Client{
 		url: "https://oapi.dingtalk.com",
-		client: requests.NewSession(requests.Option{
-			Name:    "github.com/wosai/go-clients/dingtalk",
-			Timeout: 30 * time.Second,
-		}),
+		client: requests.NewSession(
+			requests.WithGlobalTimeout(30*time.Second),
+			requests.WithUserAgent("github.com/wosai/go-clients/dingtalk"),
+		),
 		opt: opt,
 	}
 }
