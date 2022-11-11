@@ -144,7 +144,7 @@ type (
 		Email            string       `json:"email"`
 		WorkPlace        string       `json:"work_place"`
 		Remark           string       `json:"remark"`
-		ExclusiveAccount string       `json:"exclusive_account"`
+		ExclusiveAccount bool         `json:"exclusive_account"`
 		OrgEmail         string       `json:"org_email"`
 		DeptIdList       []int        `json:"dept_id_list"`
 		DeptOrderList    []DeptOrder  `json:"dept_order_list"`
