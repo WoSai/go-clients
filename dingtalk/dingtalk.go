@@ -371,13 +371,25 @@ func (ding *Client) GetDepartmentListParentByUser(ctx context.Context, dingID st
 	return ret.Result, res, err
 }
 
-func (ding *Client) SendWorkNotify(workNotifyRequest *WorkNotifyRequest) (*DingBaseResponse, error) {
-	res := new(DingBaseResponse)
-	workNotifyRequest.AgentID = ding.Option.AgentID
-	err := ding.invokeAPI(http.MethodPost, "/topapi/message/corpconversation/asyncsend_v2", requests.Params{
-		Json: workNotifyRequest,
-	},
-		res,
-	)
+func (ding *Client) SendWorkNotify(ctx context.Context, workNotifyRequest *RequestWorkNotify) (*http.Response, error) {
+
+	if workNotifyRequest.AgentID == "" {
+		workNotifyRequest.AgentID = ding.opt.AgentID
+	}
+
+	var ret = new(BasicResponse)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.PostWithContext(
+			ctx,
+			ding.url+"/topapi/message/corpconversation/asyncsend_v2",
+			requests.Params{Query: requests.Any{"access_token": ding.AccessToken()}, Json: workNotifyRequest},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+
 	return res, err
 }
