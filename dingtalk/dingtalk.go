@@ -370,3 +370,14 @@ func (ding *Client) GetDepartmentListParentByUser(ctx context.Context, dingID st
 	})
 	return ret.Result, res, err
 }
+
+func (ding *Client) SendWorkNotify(workNotifyRequest *WorkNotifyRequest) (*DingBaseResponse, error) {
+	res := new(DingBaseResponse)
+	workNotifyRequest.AgentID = ding.Option.AgentID
+	err := ding.invokeAPI(http.MethodPost, "/topapi/message/corpconversation/asyncsend_v2", requests.Params{
+		Json: workNotifyRequest,
+	},
+		res,
+	)
+	return res, err
+}

@@ -410,6 +410,77 @@ type (
 		BasicResponse   `json:",inline"`
 		ProcessInstance *ProcessInstance `json:"process_instance,omitempty"`
 	}
+
+	RequestWorkNotify struct {
+		AgentID    string          `json:"agent_id,omitempty"`
+		UserIDList string          `json:"userid_list,omitempty"`
+		DeptIDList string          `json:"dept_id_list,omitempty"`
+		Message    *RequestMessage `json:"msg,omitempty"`
+	}
+
+	RequestMessage struct {
+		MessageType RobotMessageType `json:"msgtype"`
+		At          *MsgAt           `json:"at,omitempty"`
+		Text        *MsgText         `json:"text,omitempty"`
+		Link        *MsgLink         `json:"link,omitempty"`
+		Markdown    *MsgMarkdown     `json:"markdown,omitempty"`
+		ActionCard  *MsgActionCard   `json:"action_card,omitempty"`
+		FeedCard    *MsgFeedCard     `json:"feedCard,omitempty"`
+	}
+
+	MsgAt struct {
+		AtMobiles     []string `json:"atMobiles,omitempty"`
+		AtDingTalkIDs []string `json:"atDingtalkIds,omitempty"`
+		IsAtAll       bool     `json:"isAtAll,omitempty"`
+	}
+
+	MsgText struct {
+		Content string `json:"content"`
+	}
+
+	MsgLink struct {
+		Title      string `json:"title"`
+		Text       string `json:"text"`
+		MessageURL string `json:"messageUrl"`
+		PicURL     string `json:"picUrl,omitempty"`
+	}
+
+	MsgMarkdown struct {
+		Title string `json:"title"`
+		Text  string `json:"text"`
+	}
+
+	MsgActionCard struct {
+		Title             string    `json:"title"`
+		Markdown          string    `json:"markdown"`
+		SingleTitle       string    `json:"singleTitle,omitempty"`
+		SingleURL         string    `json:"singleURL,omitempty"`
+		Buttons           []*Button `json:"btn_json_list,omitempty"`
+		ButtonOrientation string    `json:"btn_orientation,omitempty"`
+	}
+
+	Button struct {
+		Title     string `json:"title"`
+		ActionURL string `json:"action_url"`
+	}
+
+	MsgFeedCard struct {
+		Links []*struct {
+			Title      string `json:"title"`
+			MessageURL string `json:"messageURL"`
+			PicURL     string `json:"picURL"`
+		} `json:"links"`
+	}
+
+	RobotMessageType string
+)
+
+const (
+	RobotTextMessage       RobotMessageType = "text"
+	RobotLinkMessage       RobotMessageType = "link"
+	RobotMarkdownMessage   RobotMessageType = "markdown"
+	RobotActionCardMessage RobotMessageType = "action_card"
+	RobotFeedCardMessage   RobotMessageType = "feedCard"
 )
 
 func (ts *UnixTimestamp) UnmarshalJSON(data []byte) error {
