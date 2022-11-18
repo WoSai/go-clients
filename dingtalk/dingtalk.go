@@ -393,3 +393,24 @@ func (ding *Client) SendWorkNotify(ctx context.Context, workNotifyRequest *Reque
 
 	return res, err
 }
+
+func (ding *Client) GetDepartmentList(ctx context.Context, deptID int, isChild bool) ([]*DingDepartmentInfo, *http.Response, error) {
+	ret := new(ResponseDingDepartmentList)
+	var res *http.Response
+	var err error
+
+	err = ding.RetryOnAccessTokenExpired(ctx, 1, func() error {
+		res, _, err = ding.client.GetWithContext(
+			ctx,
+			ding.url+"/department/list",
+			requests.Params{Query: requests.Any{
+				"access_token": ding.AccessToken(),
+				"id":           strconv.Itoa(deptID),
+				"fetch_child":  strconv.FormatBool(isChild)}},
+			UnmarshalAndParseError(ret),
+		)
+		return err
+	})
+
+	return ret.DepartmentList, res, err
+}

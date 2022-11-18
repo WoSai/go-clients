@@ -473,6 +473,17 @@ type (
 	}
 
 	RobotMessageType string
+
+	ResponseDingDepartmentList struct {
+		BasicResponse  `json:",inline"`
+		DepartmentList []*DingDepartmentInfo `json:"department"`
+	}
+
+	DingDepartmentInfo struct {
+		Name     string `json:"name"`
+		ID       int    `json:"id"`
+		ParentID int    `json:"parentid"`
+	}
 )
 
 const (
